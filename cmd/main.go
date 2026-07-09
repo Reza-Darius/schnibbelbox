@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/reza-darius/schnibbel/cmd/config"
-	utils "github.com/reza-darius/schnibbel/internal"
 	"github.com/reza-darius/schnibbel/internal/database"
+	"github.com/reza-darius/schnibbel/internal/utils"
 )
 
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -18,14 +17,20 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-const MigrationPath = "./migrations"
-const DBPath = "./database.db"
-
 func main() {
 	utils.InitLogging()
-	config := config.LoadConfig()
 
-	database.Init(config.DBPath, config.MigrationPath)
+	config, err := utils.LoadConfig()
+	if err != nil {
+		slog.Error("failed to load config", "err", err)
+		os.Exit(1)
+	}
+
+	_, err = database.Init(config.DBPath, config.MigrationPath)
+	if err != nil {
+		slog.Error("database init error")
+		os.Exit(1)
+	}
 
 	args := os.Args
 	if len(args) < 2 {
@@ -37,6 +42,6 @@ func main() {
 
 	slog.Info("listening", "addr", args[1])
 
-	err := http.ListenAndServe(args[1], mux)
+	err = http.ListenAndServe(args[1], mux)
 	log.Fatal(err)
 }

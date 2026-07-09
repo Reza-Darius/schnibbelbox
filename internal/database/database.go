@@ -4,7 +4,6 @@ package database
 import (
 	"database/sql"
 	"log/slog"
-	"os"
 	"time"
 
 	// Import the SQLite driver
@@ -13,14 +12,19 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-func Init(dbPath string, migrationDir string) *sql.DB {
+type Database struct {
+	db *sql.DB
+}
+
+func Init(dbPath string, migrationDir string) (*Database, error) {
 	slog.Info("initializing database", "path", dbPath)
 
+	// PRAGMA settings on startup
 	dsn := dbPath + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL&_cache_size=-64000&_foreign_keys=ON"
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		slog.Error("database initialization failed", "path", dbPath, "err", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	db.SetMaxOpenConns(1) // SQLite supports only one writer at a time
@@ -30,18 +34,21 @@ func Init(dbPath string, migrationDir string) *sql.DB {
 	if err := db.Ping(); err != nil {
 		_ = db.Close()
 		slog.Error("failed to ping database", "err", err)
+		return nil, err
 	}
 
 	if err := goose.SetDialect("sqlite3"); err != nil {
 		slog.Error("failed to set goose dialect:", "err", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	err = goose.Up(db, migrationDir)
 	if err != nil {
 		slog.Error("failed to run migrations", "err", err)
-		os.Exit(1)
+		return nil, err
 	}
 
-	return db
+	return &Database{
+		db,
+	}, nil
 }

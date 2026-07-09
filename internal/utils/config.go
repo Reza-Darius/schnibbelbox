@@ -1,9 +1,7 @@
-// Package config provides config utilites
-package config
+package utils
 
 import (
 	"log/slog"
-	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -15,13 +13,12 @@ type AppConfig struct {
 	MigrationPath string `env:"MIGRATIONPATH" env-defaul:"./migrations"`
 }
 
-func LoadConfig() AppConfig {
+func LoadConfig() (AppConfig, error) {
 	var cfg AppConfig
 	err := cleanenv.ReadConfig(".env", &cfg)
 	if err != nil {
-		slog.Error("failed to load config", "err", err)
-		os.Exit(1)
+		return AppConfig{}, err
 	}
 	slog.Info("config loaded")
-	return cfg
+	return cfg, nil
 }
