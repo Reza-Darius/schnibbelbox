@@ -37,15 +37,9 @@ func InitSQLite(dbPath string) (*Database, error) {
 		return nil, err
 	}
 
-  goose.SetBaseFS(migrationFiles)
-
-	if err := goose.SetDialect("sqlite3"); err != nil {
-		slog.Error("failed to set goose dialect:", "err", err)
-		return nil, err
-	}
-
-	err = goose.Up(db, "migrations")
+	err = runMigration(db, goose.DialectSQLite3)
 	if err != nil {
+		_ = db.Close()
 		slog.Error("failed to run migrations", "err", err)
 		return nil, err
 	}

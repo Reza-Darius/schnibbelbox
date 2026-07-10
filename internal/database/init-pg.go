@@ -41,21 +41,13 @@ func InitPG() (*PGDatabase, error) {
 		return nil, err
 	}
 
-	if err := goose.SetDialect(string(goose.DialectPostgres)); err != nil {
-		pool.Close()
-		slog.Error("failed to set goose dialect:", "err", err)
-		return nil, err
-	}
-
-  goose.SetBaseFS(migrationFiles)
-
 	db := stdlib.OpenDBFromPool(pool)
 	defer db.Close()
 
-	err = goose.Up(db, "migrations")
+	err = runMigration(db, goose.DialectPostgres)
 	if err != nil {
 		pool.Close()
-		slog.Error("failed to run migrations", "err", err)
+		slog.Error("migration error", "err", err)
 		return nil, err
 	}
 
