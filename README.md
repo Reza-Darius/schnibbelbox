@@ -2,7 +2,9 @@
 
 A small little project to play around with docker and postgres
 
-`.env` format:
+Run with `docker compose up`
+
+`.env` format for configuration:
 
 ```
 # addr the app listens on inside the container

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/reza-darius/schnibbel/internal/database"
-	"github.com/reza-darius/schnibbel/internal/routes"
+	"github.com/reza-darius/schnibbel/internal/server"
 	"github.com/reza-darius/schnibbel/internal/utils"
 )
 
@@ -25,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	routes := routes.InitRoutes()
+	routes := server.InitRoutes()
 
 	addr := "0.0.0.0:" + config.Port
 	slog.Info("listening", "addr", addr)
