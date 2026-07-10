@@ -8,14 +8,13 @@ import (
 
 type AppConfig struct {
 	Port          string `env:"PORT" env-default:"80"`
-	Host          string `env:"HOST" env-default:"localhost"`
-	DBPath        string `env:"DBPATH" env-default:"./app_test.db"`
-	MigrationPath string `env:"MIGRATIONPATH" env-defaul:"./migrations"`
+	DBPath        string `env:"DB_PATH" env-default:"./app_test.db"`
+	MigrationPath string `env:"MIGRATION_PATH" env-defaul:"./migrations"`
 }
 
 func LoadConfig() (AppConfig, error) {
 	var cfg AppConfig
-	err := cleanenv.ReadConfig(".env", &cfg)
+	err := cleanenv.ReadEnv(&cfg)
 	if err != nil {
 		return AppConfig{}, err
 	}

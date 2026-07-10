@@ -1,3 +1,10 @@
+# Schnibbelbox
+
+A small little project to play around with docker and postgres
+
+`.env` format:
+
+```
 # addr the app listens on inside the container
 PORT=3000
 
@@ -9,3 +16,4 @@ DB_PATH=./database.db
 POSTGRES_USER=schnib-user
 POSTGRES_PASSWORD=mypassword
 POSTGRES_DB=schnib-db
+```

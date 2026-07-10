@@ -16,8 +16,8 @@ type Database struct {
 	db *sql.DB
 }
 
-func Init(dbPath string, migrationDir string) (*Database, error) {
-	slog.Info("initializing database", "path", dbPath)
+func InitSQLite(dbPath string) (*Database, error) {
+	slog.Info("initializing SQLite database", "path", dbPath)
 
 	// PRAGMA settings on startup
 	dsn := dbPath + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL&_cache_size=-64000&_foreign_keys=ON"
@@ -37,12 +37,14 @@ func Init(dbPath string, migrationDir string) (*Database, error) {
 		return nil, err
 	}
 
+  goose.SetBaseFS(migrationFiles)
+
 	if err := goose.SetDialect("sqlite3"); err != nil {
 		slog.Error("failed to set goose dialect:", "err", err)
 		return nil, err
 	}
 
-	err = goose.Up(db, migrationDir)
+	err = goose.Up(db, "migrations")
 	if err != nil {
 		slog.Error("failed to run migrations", "err", err)
 		return nil, err
@@ -52,3 +54,7 @@ func Init(dbPath string, migrationDir string) (*Database, error) {
 		db,
 	}, nil
 }
+
+
+
+
