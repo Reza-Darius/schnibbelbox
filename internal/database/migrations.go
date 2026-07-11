@@ -8,6 +8,9 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
+// embedding the migration files simplifies our dockerfile setup
+// by not needing to copy the migration files over to the run time stage
+
 //go:embed migrations
 var migrationFiles embed.FS
 
